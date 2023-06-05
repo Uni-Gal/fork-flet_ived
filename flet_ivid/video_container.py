@@ -192,13 +192,7 @@ class VideoContainer(Container):
             self.image_frames_viewer.src_base64 = i
             self.image_frames_viewer.update()
 
-            elapsed_time = time.time() - start_time  # Calculate elapsed time
-            # Calculate the desired time for the next frame update
-            desired_time = (num + 1) * self.__frame_per_sleep
-
-            # Calculate the remaining time to sleep
-            sleep_time = max(0, desired_time - elapsed_time)
-            time.sleep(sleep_time)
+            time.sleep(self.__frame_per_sleep)
             num += 1
 
         self.show_play()
