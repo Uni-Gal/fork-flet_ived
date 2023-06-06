@@ -1,3 +1,5 @@
+import re
+
 from flet import Container
 from flet_core.control import OptionalNumber
 from flet_core.types import BlendMode
@@ -92,7 +94,7 @@ class VideoContainer(Container):
         self.image_frames_viewer = Image(expand=True, visible=False, fit=self.video_frame_fit_type)
         self.video_tool_stack.controls.append(Row([self.image_frames_viewer], alignment=flet.MainAxisAlignment.CENTER))
 
-        self.__video_progress_bar = Container(height=2, width=100, bgcolor=flet.colors.BLUE_200)
+        self.__video_progress_bar = Container(height=2, width=1, bgcolor=flet.colors.BLUE_200)
         self.video_tool_stack.controls.append(Row([self.__video_progress_bar], alignment=flet.MainAxisAlignment.START))
 
         def play_video(e):
@@ -157,7 +159,14 @@ class VideoContainer(Container):
             self.__video_progress_bar.width = percent_of_progress * 1 * self.page.width
 
         if self.__video_progress_bar.page is not None:
-            self.__video_progress_bar.update()
+            try:
+                self.__video_progress_bar.update()
+            except Exception as e:
+                pattern = r"control with ID '(.*)' not found"
+                match = re.search(pattern, e.args[0])
+                if not match:
+                    print(e)
+                return
 
     def update(self):
         self.image_frames_viewer.fit = self.video_frame_fit_type
@@ -176,7 +185,6 @@ class VideoContainer(Container):
         self.image_frames_viewer.visible = True
 
         num = self.__cur_play_frame
-        start_time = time.time()
         video_frames_len = len(self.__all_frames_of_video)
 
         for index, i in enumerate(self.__all_frames_of_video[self.__cur_play_frame:-1]):
@@ -190,7 +198,15 @@ class VideoContainer(Container):
             threading.Thread(target=self.update_video_progress, args=[num], daemon=True).start()
 
             self.image_frames_viewer.src_base64 = i
-            self.image_frames_viewer.update()
+
+            try:
+                self.image_frames_viewer.update()
+            except Exception as e:
+                pattern = r"control with ID '(.*)' not found"
+                match = re.search(pattern, e.args[0])
+                if not match:
+                    print(e)
+                return
 
             time.sleep(self.__frame_per_sleep)
             num += 1
