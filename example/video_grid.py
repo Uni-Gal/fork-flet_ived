@@ -51,7 +51,7 @@ class VideoGrid(object):
         page.padding = 50
         page.update()
 
-        images = ft.GridView(
+        video_grid = ft.GridView(
             expand=1,
             runs_count=3,
             max_extent=130,
@@ -66,17 +66,49 @@ class VideoGrid(object):
             page.update()
 
         def create_video_obj(cur_video_key):
-            return VideoContainer(
+
+            def listview_update():
+                for index, frame in enumerate(vcc.all_frames_of_video[:7]):
+                    lvv.controls.append(
+                        ft.Image(
+                            src_base64=frame,
+                            expand=True,
+                            fit=ft.ImageFit.COVER
+                        )
+                    )
+                lvv.update()
+
+            vcc = VideoContainer(
                 cur_video_key,
                 border_radius=10,
                 expand=True,
                 play_after_loading=False,
                 video_play_button=True,
+                padding=ft.padding.only(bottom=16),
+                exec_after_full_loaded=listview_update
+            )
+
+            lvv = ft.ListView()
+
+            return ft.Column(
+                controls=[
+                    vcc,
+                    ft.Stack(
+                        controls=[
+                            ft.Container(
+                                bgcolor=ft.colors.BLACK54,
+                                height=60,
+                                content=lvv
+                            )
+                        ]
+
+                    )
+                ],
             )
 
         dlg_modal = ft.AlertDialog(
             modal=True,
-            title=ft.Text("Please confirm"),
+            title=ft.Text("调整素材首尾"),
             content=None,
             actions=[
                 ft.TextButton("返回", on_click=close_dlg),
@@ -98,7 +130,7 @@ class VideoGrid(object):
 
         page.add(
             ft.Container(
-                content=images,
+                content=video_grid,
                 bgcolor=ft.colors.BLACK12,
                 padding=20,
                 height=210,
@@ -115,7 +147,7 @@ class VideoGrid(object):
             if count == 0:
                 break
             if is_match_video_ext(file):
-                images.controls.append(
+                video_grid.controls.append(
                     VideoContainer(
                         os.path.join(video_dir, file),
                         border_radius=10,
@@ -127,7 +159,9 @@ class VideoGrid(object):
                     )
                 )
 
-        page.update()
+        video_grid.update()
+
+        # page.update()
 
 
 if __name__ == '__main__':

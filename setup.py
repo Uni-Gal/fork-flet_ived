@@ -4,14 +4,14 @@ with open("README.md", encoding="utf-8") as f:
     long_des = str(f.read())
 
 setup(
-    name='flet_ivid',
-    version='1.2',
-    author='SKbarbon',
+    name='flet_ivid_hks',
+    version='1.0',
+    author='SKbarbon, Hocassian',
     description='A package tool that provide basic video player for flet.',
     long_description=long_des,
     long_description_content_type='text/markdown',
-    url='https://github.com/SKbarbon/flet_ived',
-    install_requires=["flet", "pygame", "moviepy", "opencv-python"],
+    url='https://github.com/Uni-Gal/fork-flet_ived',
+    install_requires=["flet", "opencv-python"],
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

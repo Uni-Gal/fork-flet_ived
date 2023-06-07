@@ -18,7 +18,7 @@ class VideoContainer(Container):
     """This will show a video you choose."""
 
     def __init__(self, video_path: str, play_after_loading=False, video_frame_fit_type: flet.ImageFit = None,
-                 video_progress_bar=True, video_play_button=False, content=None, ref=None, key=None, width=None,
+                 video_progress_bar=True, video_play_button=False, exec_after_full_loaded=None, content=None, ref=None, key=None, width=None,
                  height=None, left=None,
                  top=None, right=None, bottom=None, expand=None, col=None, opacity=None, rotate=None, scale=None,
                  offset=None, aspect_ratio=None, animate_opacity=None, animate_size=None, animate_position=None,
@@ -43,11 +43,12 @@ class VideoContainer(Container):
         self.fps = 0
         self.__video_is_full_loaded = None
         self.video_frames = None
+        self.exec_after_full_loaded = exec_after_full_loaded
 
         if not os.path.isfile(video_path):
             raise FileNotFoundError("Cannot find the video at the path you set.")
 
-        self.__all_frames_of_video = []
+        self.all_frames_of_video = []
         self.__video_played = False
         self.video_progress_bar = video_progress_bar
         self.video_play_button = video_play_button
@@ -185,9 +186,9 @@ class VideoContainer(Container):
         self.image_frames_viewer.visible = True
 
         num = self.__cur_play_frame
-        video_frames_len = len(self.__all_frames_of_video)
+        video_frames_len = len(self.all_frames_of_video)
 
-        for index, i in enumerate(self.__all_frames_of_video[self.__cur_play_frame:-1]):
+        for index, i in enumerate(self.all_frames_of_video[self.__cur_play_frame:-1]):
             if not self.__video_played:
                 self.__cur_play_frame = self.__cur_play_frame + index
                 break
@@ -231,7 +232,7 @@ class VideoContainer(Container):
             encoded_frame = base64.b64encode(buffer).decode('utf-8')
 
             # Store the base64-encoded frame in the list
-            self.__all_frames_of_video.append(encoded_frame)
+            self.all_frames_of_video.append(encoded_frame)
 
             # check if the image is shown
             if self.image_frames_viewer.src_base64 is None:
@@ -246,7 +247,10 @@ class VideoContainer(Container):
         video.release()
 
         self.__video_is_full_loaded = True
-        return self.__all_frames_of_video
+        # exec callback
+        if self.exec_after_full_loaded:
+            self.exec_after_full_loaded()
+        return self.all_frames_of_video
 
     def get_video_duration(self, video_path):
         cap = cv2.VideoCapture(video_path)
