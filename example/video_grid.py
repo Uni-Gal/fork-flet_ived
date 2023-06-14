@@ -3,7 +3,7 @@ import os
 import time
 
 import flet as ft
-from flet_ivid import VideoContainer
+from flet_ivid_hks import VideoContainer
 
 video_ext = [
     '.mp4', '.avi', '.mpg', '.mov',
@@ -155,7 +155,8 @@ class VideoGrid(object):
                         play_after_loading=False,
                         on_click=open_dlg_modal,
                         video_progress_bar=False,
-                        key=os.path.join(video_dir, file)
+                        key=os.path.join(video_dir, file),
+                        only_show_cover=True,
                     )
                 )
 

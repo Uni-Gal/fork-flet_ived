@@ -17,17 +17,69 @@ import time
 class VideoContainer(Container):
     """This will show a video you choose."""
 
-    def __init__(self, video_path: str, play_after_loading=False, video_frame_fit_type: flet.ImageFit = None,
-                 video_progress_bar=True, video_play_button=False, exec_after_full_loaded=None, content=None, ref=None, key=None, width=None,
-                 height=None, left=None,
-                 top=None, right=None, bottom=None, expand=None, col=None, opacity=None, rotate=None, scale=None,
-                 offset=None, aspect_ratio=None, animate_opacity=None, animate_size=None, animate_position=None,
-                 animate_rotation=None, animate_scale=None, animate_offset=None, on_animation_end=None, tooltip=None,
-                 visible=None, disabled=None, data=None, padding=None, margin=None, alignment=None, bgcolor=None,
-                 gradient=None, blend_mode=BlendMode.NONE, border=None, border_radius=None, image_src=None,
-                 image_src_base64=None, image_repeat=None, image_fit=None, image_opacity: OptionalNumber = None,
-                 shape=None, clip_behavior=None, ink=None, animate=None, blur=None, shadow=None, url=None,
-                 url_target=None, theme=None, theme_mode=None, on_click=None, on_long_press=None, on_hover=None):
+    def __init__(
+            self,
+            video_path: str,
+            play_after_loading=False,
+            video_frame_fit_type: flet.ImageFit = None,
+            video_progress_bar=True,
+            video_play_button=False,
+            exec_after_full_loaded=None,
+            only_show_cover=False,
+            content=None,
+            ref=None,
+            key=None,
+            width=None,
+            height=None,
+            left=None,
+            top=None,
+            right=None,
+            bottom=None,
+            expand=None,
+            col=None,
+            opacity=None,
+            rotate=None,
+            scale=None,
+            offset=None,
+            aspect_ratio=None,
+            animate_opacity=None,
+            animate_size=None,
+            animate_position=None,
+            animate_rotation=None,
+            animate_scale=None,
+            animate_offset=None,
+            on_animation_end=None,
+            tooltip=None,
+            visible=None,
+            disabled=None,
+            data=None,
+            padding=None,
+            margin=None,
+            alignment=None,
+            bgcolor=None,
+            gradient=None,
+            blend_mode=BlendMode.NONE,
+            border=None,
+            border_radius=None,
+            image_src=None,
+            image_src_base64=None,
+            image_repeat=None,
+            image_fit=None,
+            image_opacity: OptionalNumber = None,
+            shape=None,
+            clip_behavior=None,
+            ink=None,
+            animate=None,
+            blur=None,
+            shadow=None,
+            url=None,
+            url_target=None,
+            theme=None,
+            theme_mode=None,
+            on_click=None,
+            on_long_press=None,
+            on_hover=None
+    ):
         super().__init__(content, ref, key, width, height, left, top, right, bottom, expand, col, opacity, rotate,
                          scale, offset, aspect_ratio, animate_opacity, animate_size, animate_position, animate_rotation,
                          animate_scale, animate_offset, on_animation_end, tooltip, visible, disabled, data, padding,
@@ -58,6 +110,10 @@ class VideoContainer(Container):
 
         # generate the UI
         self.__ui()
+
+        if only_show_cover:
+            self.read_video_cover(video_path)
+            return
 
         # start a video reader.
         if play_after_loading:
@@ -216,6 +272,23 @@ class VideoContainer(Container):
 
     def pause(self):
         self.__video_played = False
+
+    def read_video_cover(self, video_path):
+        video = cv2.VideoCapture(video_path)
+        frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT)
+        slice_frame_num = frame_count / 2
+        video.set(cv2.CAP_PROP_POS_FRAMES, slice_frame_num)
+        success, frame = video.read()
+        _, buffer = cv2.imencode('.jpg', frame)
+        encoded_frame = base64.b64encode(buffer).decode('utf-8')
+
+        if self.image_frames_viewer.src_base64 is None:
+            self.image_frames_viewer.src_base64 = encoded_frame
+            self.image_frames_viewer.visible = True
+            if self.image_frames_viewer.page is not None:
+                self.image_frames_viewer.update()
+
+        video.release()
 
     def read_the_video(self, video_path):
         # Open the video file

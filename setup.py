@@ -5,7 +5,7 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name='flet_ivid_hks',
-    version='1.0',
+    version='1.2',
     author='SKbarbon, Hocassian',
     description='A package tool that provide basic video player for flet.',
     long_description=long_des,
