@@ -85,19 +85,22 @@ class VideoGrid(object):
             state.last_x = state.selector_x
 
         def move_left_update(e):
-            if state.last_x + (e.local_x - state.init_local_x) < 0:
-                state.selector_x = 0
-                state.selector_width = state.last_width + state.last_x
+            if state.last_width - (e.local_x - state.init_local_x) < state.min_interval:
+                state.selector_x = state.last_x + state.last_width - state.min_interval
+                state.selector_width = state.min_interval
+            elif state.last_x + (e.local_x - state.init_local_x) < 0:
+                state.selector_x = -8
+                state.selector_width = state.last_width + state.last_x + 8
             else:
                 state.selector_x = state.last_x + (e.local_x - state.init_local_x)
                 state.selector_width = state.last_width - (e.local_x - state.init_local_x)
             bg_selector_item.shapes = [
-                cv.Rect(0, 0, state.selector_x, 60, paint=bg_paint),
-                cv.Rect(state.selector_x + state.selector_width, 0, 400 - state.selector_x - state.selector_width,
+                cv.Rect(0, 0, state.selector_x + 8, 60, paint=bg_paint),
+                cv.Rect(state.selector_x + state.selector_width + 8, 0, 400 - state.selector_x - state.selector_width,
                         60,
                         paint=bg_paint),
-                cv.Line(state.selector_x, 0, state.selector_x + state.selector_width, 0, paint=stroke_paint),
-                cv.Line(state.selector_x, 60, state.selector_x + state.selector_width, 60, paint=stroke_paint),
+                cv.Line(state.selector_x + 8, 0, state.selector_x + state.selector_width + 8, 0, paint=stroke_paint),
+                cv.Line(state.selector_x + 8, 60, state.selector_x + state.selector_width + 8, 60, paint=stroke_paint),
             ]
             bg_selector_item.update()
             range_selector_left_item.left = state.selector_x
@@ -119,11 +122,12 @@ class VideoGrid(object):
             else:
                 state.selector_width = state.last_width + (e.local_x - state.init_local_x)
             bg_selector_item.shapes = [
-                cv.Rect(0, 0, state.selector_x, 60, paint=bg_paint),
-                cv.Rect(state.selector_x + state.selector_width, 0, 400 - state.selector_x - state.selector_width, 60,
+                cv.Rect(0, 0, state.selector_x + 8, 60, paint=bg_paint),
+                cv.Rect(state.selector_x + state.selector_width + 8, 0, 400 - state.selector_x - state.selector_width,
+                        60,
                         paint=bg_paint),
-                cv.Line(state.selector_x, 0, state.selector_x + state.selector_width, 0, paint=stroke_paint),
-                cv.Line(state.selector_x, 60, state.selector_x + state.selector_width, 60, paint=stroke_paint),
+                cv.Line(state.selector_x + 8, 0, state.selector_x + state.selector_width + 8, 0, paint=stroke_paint),
+                cv.Line(state.selector_x + 8, 60, state.selector_x + state.selector_width + 8, 60, paint=stroke_paint),
             ]
             bg_selector_item.update()
 
@@ -152,10 +156,11 @@ class VideoGrid(object):
 
         bg_selector_item = cv.Canvas(
             [
-                cv.Line(state.selector_x, 0, state.selector_x + state.selector_width, 0, paint=stroke_paint),
-                cv.Line(state.selector_x, 60, state.selector_x + state.selector_width, 60, paint=stroke_paint),
-                cv.Rect(0, 0, state.selector_x, 60, paint=bg_paint),
-                cv.Rect(state.selector_x + state.selector_width, 0, 400 - state.selector_x - state.selector_width, 60,
+                cv.Line(state.selector_x + 8, 0, state.selector_x + state.selector_width + 8, 0, paint=stroke_paint),
+                cv.Line(state.selector_x + 8, 60, state.selector_x + state.selector_width + 8, 60, paint=stroke_paint),
+                cv.Rect(0, 0, state.selector_x + 8, 60, paint=bg_paint),
+                cv.Rect(state.selector_x + state.selector_width + 8, 0, 400 - state.selector_x - state.selector_width,
+                        60,
                         paint=bg_paint),
             ],
             width=float("inf"),
@@ -169,8 +174,8 @@ class VideoGrid(object):
             expand=False,
             content=cv.Canvas(
                 [
-                    cv.Line(8, 0, 8, 60, paint=stroke_paint),
-                    cv.Circle(8, 30, 8, fill_paint),
+                    cv.Line(0, 0, 0, 60, paint=stroke_paint),
+                    cv.Circle(0, 30, 8, fill_paint),
                 ],
                 expand=False,
                 content=ft.GestureDetector(
@@ -189,8 +194,8 @@ class VideoGrid(object):
             left=state.selector_x + state.selector_width,
             content=cv.Canvas(
                 [
-                    cv.Line(8, 0, 8, 60, paint=stroke_paint),
-                    cv.Circle(8, 30, 8, fill_paint),
+                    cv.Line(16, 0, 16, 60, paint=stroke_paint),
+                    cv.Circle(16, 30, 8, fill_paint),
                 ],
                 content=ft.GestureDetector(
                     on_pan_start=move_right_start,
