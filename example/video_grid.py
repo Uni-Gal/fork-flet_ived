@@ -4,6 +4,8 @@ import time
 
 import flet as ft
 import flet.canvas as cv
+from flet_core import ClipBehavior
+
 from flet_ivid_hks import VideoContainer
 
 video_ext = [
@@ -26,13 +28,13 @@ def is_match_video_ext(filename):
 
 
 class State:
-    selector_x = 120
-    selector_width = 120
+    selector_x = -8
+    selector_width = 400
     init_local_x = 0
-    is_scroll = False
+    circle_radius = 8
     min_interval = 50
-    last_x = 120
-    last_width = 120
+    last_x = -8
+    last_width = 400
 
 
 state = State()
@@ -89,25 +91,33 @@ class VideoGrid(object):
                 state.selector_x = state.last_x + state.last_width - state.min_interval
                 state.selector_width = state.min_interval
             elif state.last_x + (e.local_x - state.init_local_x) < 0:
-                state.selector_x = -8
-                state.selector_width = state.last_width + state.last_x + 8
+                state.selector_x = -state.circle_radius
+                state.selector_width = state.last_width + state.last_x + state.circle_radius
             else:
                 state.selector_x = state.last_x + (e.local_x - state.init_local_x)
                 state.selector_width = state.last_width - (e.local_x - state.init_local_x)
+
             bg_selector_item.shapes = [
-                cv.Rect(0, 0, state.selector_x + 8, 60, paint=bg_paint),
-                cv.Rect(state.selector_x + state.selector_width + 8, 0, 400 - state.selector_x - state.selector_width,
+                cv.Line(state.selector_x + state.circle_radius, 0,
+                        state.selector_x + state.selector_width + state.circle_radius, 0,
+                        paint=stroke_paint),
+                cv.Line(state.selector_x + state.circle_radius, 60,
+                        state.selector_x + state.selector_width + state.circle_radius, 60,
+                        paint=stroke_paint),
+                cv.Rect(0, 0, state.selector_x + state.circle_radius, 60, paint=bg_paint),
+                cv.Rect(state.selector_x + state.selector_width + state.circle_radius, 0,
+                        400 - state.selector_x - state.selector_width - state.circle_radius,
                         60,
                         paint=bg_paint),
-                cv.Line(state.selector_x + 8, 0, state.selector_x + state.selector_width + 8, 0, paint=stroke_paint),
-                cv.Line(state.selector_x + 8, 60, state.selector_x + state.selector_width + 8, 60, paint=stroke_paint),
             ]
             bg_selector_item.update()
             range_selector_left_item.left = state.selector_x
             range_selector_left_item.update()
 
         def move_left_end(e):
-            print(e)
+            print('左边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
+            print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
+            print('视频时长跨度占比=', state.selector_width / 400)
 
         def move_right_start(e):
             state.init_local_x = e.local_x
@@ -117,26 +127,34 @@ class VideoGrid(object):
         def move_right_update(e):
             if state.last_width + (e.local_x - state.init_local_x) <= state.min_interval:
                 state.selector_width = state.min_interval
-            elif state.selector_x + state.last_width + (e.local_x - state.init_local_x) >= 400 - 16:
-                state.selector_width = 400 - 16 - state.selector_x
+            elif state.selector_x + state.last_width + (
+                    e.local_x - state.init_local_x) >= 400 - state.circle_radius:
+                state.selector_width = 400 - state.circle_radius - state.selector_x
             else:
                 state.selector_width = state.last_width + (e.local_x - state.init_local_x)
             bg_selector_item.shapes = [
-                cv.Rect(0, 0, state.selector_x + 8, 60, paint=bg_paint),
-                cv.Rect(state.selector_x + state.selector_width + 8, 0, 400 - state.selector_x - state.selector_width,
+                cv.Line(state.selector_x + state.circle_radius, 0,
+                        state.selector_x + state.selector_width + state.circle_radius, 0,
+                        paint=stroke_paint),
+                cv.Line(state.selector_x + state.circle_radius, 60,
+                        state.selector_x + state.selector_width + state.circle_radius, 60,
+                        paint=stroke_paint),
+                cv.Rect(0, 0, state.selector_x + state.circle_radius, 60, paint=bg_paint),
+                cv.Rect(state.selector_x + state.selector_width + state.circle_radius, 0,
+                        400 - state.selector_x - state.selector_width - state.circle_radius,
                         60,
                         paint=bg_paint),
-                cv.Line(state.selector_x + 8, 0, state.selector_x + state.selector_width + 8, 0, paint=stroke_paint),
-                cv.Line(state.selector_x + 8, 60, state.selector_x + state.selector_width + 8, 60, paint=stroke_paint),
             ]
             bg_selector_item.update()
 
             range_selector_right_item.left = state.selector_x + state.selector_width
             range_selector_right_item.update()
-            print('宽度变化：' + str(state.selector_width))
+            # print('宽度变化：' + str(state.selector_width))
 
         def move_right_end(e):
-            print(e)
+            print('右边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
+            print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
+            print('视频时长跨度占比=', state.selector_width / 400)
 
         bg_paint = ft.Paint(
             style=ft.PaintingStyle.FILL,
@@ -156,10 +174,15 @@ class VideoGrid(object):
 
         bg_selector_item = cv.Canvas(
             [
-                cv.Line(state.selector_x + 8, 0, state.selector_x + state.selector_width + 8, 0, paint=stroke_paint),
-                cv.Line(state.selector_x + 8, 60, state.selector_x + state.selector_width + 8, 60, paint=stroke_paint),
-                cv.Rect(0, 0, state.selector_x + 8, 60, paint=bg_paint),
-                cv.Rect(state.selector_x + state.selector_width + 8, 0, 400 - state.selector_x - state.selector_width,
+                cv.Line(state.selector_x + state.circle_radius, 0,
+                        state.selector_x + state.selector_width + state.circle_radius, 0,
+                        paint=stroke_paint),
+                cv.Line(state.selector_x + state.circle_radius, 60,
+                        state.selector_x + state.selector_width + state.circle_radius, 60,
+                        paint=stroke_paint),
+                cv.Rect(0, 0, state.selector_x + state.circle_radius, 60, paint=bg_paint),
+                cv.Rect(state.selector_x + state.selector_width + state.circle_radius, 0,
+                        400 - state.selector_x - state.selector_width - state.circle_radius,
                         60,
                         paint=bg_paint),
             ],
@@ -168,14 +191,14 @@ class VideoGrid(object):
         )
         range_selector_left_item = ft.Container(
             left=state.selector_x,
-            bgcolor=ft.colors.RED,
+            # bgcolor=ft.colors.RED,
             width=16,
             height=60,
             expand=False,
             content=cv.Canvas(
                 [
-                    cv.Line(0, 0, 0, 60, paint=stroke_paint),
-                    cv.Circle(0, 30, 8, fill_paint),
+                    cv.Line(state.circle_radius, 0, state.circle_radius, 60, paint=stroke_paint),
+                    cv.Circle(state.circle_radius, 30, state.circle_radius, fill_paint),
                 ],
                 expand=False,
                 content=ft.GestureDetector(
@@ -188,14 +211,14 @@ class VideoGrid(object):
 
         range_selector_right_item = ft.Container(
             width=16,
-            bgcolor=ft.colors.YELLOW,
+            # bgcolor=ft.colors.YELLOW,
             height=60,
             expand=False,
             left=state.selector_x + state.selector_width,
             content=cv.Canvas(
                 [
-                    cv.Line(16, 0, 16, 60, paint=stroke_paint),
-                    cv.Circle(16, 30, 8, fill_paint),
+                    cv.Line(state.circle_radius, 0, state.circle_radius, 60, paint=stroke_paint),
+                    cv.Circle(state.circle_radius, 30, state.circle_radius, fill_paint),
                 ],
                 content=ft.GestureDetector(
                     on_pan_start=move_right_start,
@@ -225,7 +248,7 @@ class VideoGrid(object):
                 expand=True,
                 play_after_loading=False,
                 video_play_button=True,
-                padding=ft.padding.only(bottom=16),
+                # padding=ft.padding.only(bottom=16),
                 exec_after_full_loaded=listview_update
             )
 
@@ -234,25 +257,34 @@ class VideoGrid(object):
                 spacing=0
             )
 
-            return ft.Column(
-                width=400,
-                controls=[
-                    vcc,
-                    ft.Stack(
-                        height=60,
-                        controls=[
-                            ft.Container(
-                                bgcolor=ft.colors.BLACK54,
-                                height=60,
-                                content=lvv
-                            ),
-                            bg_selector_item,
-                            range_selector_left_item,
-                            range_selector_right_item
+            return ft.Container(
+                height=300,
+                content=ft.Column(
+                    width=400,
+                    controls=[
+                        ft.Container(
+                            width=400,
+                            height=225,
+                            content=vcc
+                        ),
+                        ft.Stack(
+                            height=60,
+                            visible=True,
+                            clip_behavior=ClipBehavior.NONE,
+                            controls=[
+                                ft.Container(
+                                    bgcolor=ft.colors.BLACK54,
+                                    height=60,
+                                    content=lvv
+                                ),
+                                bg_selector_item,
+                                range_selector_left_item,
+                                range_selector_right_item
 
-                        ],
-                    ),
-                ],
+                            ],
+                        ),
+                    ],
+                ),
             )
 
         dlg_modal = ft.AlertDialog(
@@ -289,9 +321,9 @@ class VideoGrid(object):
             )
         )
 
-        video_dir = r"C:\Users\Administrator\Desktop\同合杉天MCN\output\.cache"
+        video_dir = r"C:\Users\user\Desktop\test"
 
-        count = 100
+        count = 10
 
         for file in os.listdir(video_dir):
             count = count - 1
