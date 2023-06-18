@@ -145,7 +145,7 @@ class VideoContainer(Container):
 
     def __ui(self):
         # the video tools control
-        self.video_tool_stack = Stack(expand=True)
+        self.video_tool_stack = Stack(expand=False)
         self.content = self.video_tool_stack
 
         self.image_frames_viewer = Image(expand=True, visible=False, fit=self.video_frame_fit_type)
