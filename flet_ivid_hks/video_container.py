@@ -20,6 +20,7 @@ class VideoContainer(Container):
     def __init__(
             self,
             video_path: str,
+            fps: int = 0,
             play_after_loading=False,
             video_frame_fit_type: flet.ImageFit = None,
             video_progress_bar=True,
@@ -92,7 +93,8 @@ class VideoContainer(Container):
         self.__video_play_button = None
         self.__video_is_play = False
         self.vid_duration = None
-        self.fps = 0
+        # 可以指定fps
+        self.fps = fps
         self.__video_is_full_loaded = None
         self.video_frames = None
         self.exec_after_full_loaded = exec_after_full_loaded
@@ -101,6 +103,8 @@ class VideoContainer(Container):
             raise FileNotFoundError("Cannot find the video at the path you set.")
 
         self.all_frames_of_video = []
+        self.frame_length = 0
+
         self.__video_played = False
         self.video_progress_bar = video_progress_bar
         self.video_play_button = video_play_button
@@ -151,7 +155,7 @@ class VideoContainer(Container):
         self.image_frames_viewer = Image(expand=True, visible=False, fit=self.video_frame_fit_type)
         self.video_tool_stack.controls.append(Row([self.image_frames_viewer], alignment=flet.MainAxisAlignment.CENTER))
 
-        self.__video_progress_bar = Container(height=2, width=1, bgcolor=flet.colors.BLUE_200)
+        self.__video_progress_bar = Container(height=2, bgcolor=flet.colors.BLUE_200)
         self.video_tool_stack.controls.append(Row([self.__video_progress_bar], alignment=flet.MainAxisAlignment.START))
 
         def play_video(e):
@@ -323,6 +327,9 @@ class VideoContainer(Container):
         # exec callback
         if self.exec_after_full_loaded:
             self.exec_after_full_loaded()
+
+        self.frame_length = len(self.all_frames_of_video)
+
         return self.all_frames_of_video
 
     def get_video_duration(self, video_path):
@@ -331,8 +338,10 @@ class VideoContainer(Container):
             print("Error opening video file")
             return
 
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        self.fps = fps
+        # 如果没有指定，则计算
+        if self.fps == 0:
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            self.fps = fps
 
         total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
         self.video_frames = total_frames
