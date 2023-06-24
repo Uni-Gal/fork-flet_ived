@@ -104,7 +104,7 @@ class ClipContainer(Container):
                 (state.selector_x + state.circle_radius) / 400 * self.vc.vid_duration
             )
 
-            timecode_st.value = "开始时间：" + str(
+            timecode_st.value = "start：" + str(
                 cur_timecode
             ) + "s"
             timecode_st.update()
@@ -157,7 +157,7 @@ class ClipContainer(Container):
                 (state.selector_x + state.circle_radius + state.selector_width) / 400 * self.vc.vid_duration
             )
 
-            timecode_ed.value = "结束时间：" + str(
+            timecode_ed.value = "end：" + str(
                 cur_timecode
             ) + "s"
             timecode_ed.update()
@@ -285,7 +285,7 @@ class ClipContainer(Container):
                 )
             timeline_frames.update()
 
-            timecode_ed.value = "结束时间：" + str(
+            timecode_ed.value = "end：" + str(
                 float2gtd(self.vc.vid_duration)
             ) + "s"
 
@@ -309,11 +309,11 @@ class ClipContainer(Container):
         )
 
         timecode_st = ft.Text(
-            "开始时间：0s"
+            "start：0s"
         )
 
         timecode_ed = ft.Text(
-            "结束时间：∞s"
+            "end：∞s"
         )
 
         timecode_area = ft.Container(
