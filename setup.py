@@ -5,9 +5,9 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name='flet_ivid_hks',
-    version='1.2',
+    version='1.4',
     author='SKbarbon, Hocassian',
-    description='A package tool that provide basic video player for flet.',
+    description='A package tool that provide basic video player and easy clip for flet.',
     long_description=long_des,
     long_description_content_type='text/markdown',
     url='https://github.com/Uni-Gal/fork-flet_ived',

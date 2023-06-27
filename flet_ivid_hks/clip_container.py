@@ -25,15 +25,8 @@ def float2gtd(
 
 
 def indices_for_n_parts(lst, n):
-    """给定一个列表和整数N，输出列表每N个元素的索引"""
-
-    # 确保N不会大于列表长度，如果N大于列表长度，则每个元素都是等分点
     n = min(n, len(lst))
-
-    # 计算每一部分的长度
     step = len(lst) / float(n)
-
-    # 创建一个索引列表，使用round函数来保证索引是整数
     indices = [round(step * i) for i in range(n)]
 
     return indices
@@ -112,9 +105,10 @@ class ClipContainer(Container):
             self.start_time = cur_timecode
 
         def move_left_end(e):
-            print('左边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
-            print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
-            print('视频时长跨度占比=', state.selector_width / 400)
+            # print('左边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
+            # print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
+            # print('视频时长跨度占比=', state.selector_width / 400)
+            pass
 
         def move_right_start(e):
             state.init_local_x = e.local_x
@@ -165,9 +159,10 @@ class ClipContainer(Container):
             self.end_time = cur_timecode
 
         def move_right_end(e):
-            print('右边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
-            print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
-            print('视频时长跨度占比=', state.selector_width / 400)
+            # print('右边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
+            # print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
+            # print('视频时长跨度占比=', state.selector_width / 400)
+            pass
 
         bg_paint = ft.Paint(
             style=ft.PaintingStyle.FILL,
@@ -222,7 +217,6 @@ class ClipContainer(Container):
 
         range_selector_left_item = ft.Container(
             left=state.selector_x,
-            # bgcolor=ft.colors.RED,
             width=16,
             height=60,
             expand=False,
@@ -253,7 +247,6 @@ class ClipContainer(Container):
 
         range_selector_right_item = ft.Container(
             width=16,
-            # bgcolor=ft.colors.YELLOW,
             height=60,
             expand=False,
             left=state.selector_x + state.selector_width,
@@ -295,7 +288,6 @@ class ClipContainer(Container):
 
         self.vc = VideoContainer(
             self.video_path,
-            # border_radius=10,
             width=400,
             expand=True,
             play_after_loading=False,
