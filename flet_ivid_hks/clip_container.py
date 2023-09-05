@@ -1,3 +1,5 @@
+import re
+
 from flet_core import ClipBehavior, Container
 
 from flet_ivid_hks import VideoContainer
@@ -37,7 +39,9 @@ class ClipContainer(Container):
     def __init__(
             self,
             video_path,
-            show_timecode=False
+            show_timecode=False,
+            on_move_end=None,
+            data=None,
     ):
         super().__init__()
         self.video_path = video_path
@@ -50,6 +54,11 @@ class ClipContainer(Container):
 
         self.start_time = 0
         self.end_time = 0
+        self.data = data
+        self.on_move_end = on_move_end if on_move_end else self.on_move_end
+
+    def on_move_end(self):
+        pass
 
     def clip_ui(
             self
@@ -108,6 +117,7 @@ class ClipContainer(Container):
             # print('左边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
             # print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
             # print('视频时长跨度占比=', state.selector_width / 400)
+            self.on_move_end()
             pass
 
         def move_right_start(e):
@@ -162,6 +172,7 @@ class ClipContainer(Container):
             # print('右边拖拽结束，x=', state.selector_x, 'width=', state.selector_width)
             # print('视频起始点占比=', (state.selector_x + state.circle_radius) / 400)
             # print('视频时长跨度占比=', state.selector_width / 400)
+            self.on_move_end()
             pass
 
         bg_paint = ft.Paint(
@@ -276,7 +287,15 @@ class ClipContainer(Container):
                         expand=True,
                     )
                 )
-            timeline_frames.update()
+
+            try:
+                timeline_frames.update()
+            except Exception as e:
+                pattern = r"parent control with ID '(.*)' not found"
+                match = re.search(pattern, e.args[0])
+                if not match:
+                    print(e)
+                return
 
             timecode_ed.value = "end：" + str(
                 float2gtd(self.vc.vid_duration)
